@@ -1,0 +1,11 @@
+check number of arguments
+1 argument
+read all the lines of input from the command line
+count the lines of input
+send the lines of input into sortData function
+
+2 arguments
+open file one by one
+read all the lines of input from the command line
+count the lines of input
+send the lines of input into sortData function
