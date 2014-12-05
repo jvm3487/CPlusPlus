@@ -48,24 +48,26 @@ class Ll{
     else{
       return ans;
     }
-    while ((*curr) != NULL && (*curr)->next != NULL){ 
-      if ((*curr)->next->data < (*curr)->data){
-	Node * temp = ans->head;
-	Node * add = new Node((*curr)->next->data);
-	if (temp->data > (*curr)->next->data){ //checks if node should go in the front
-	  add->next = ans->head;
-	  ans->head = add;
-	}
-	else{
-	  while ((*curr)->next->data > temp->next->data){ //locates where to insert node
-	    temp = temp->next;
-	  }
-	  add->next = temp->next;
-	  temp->next = add;
-	}
+    while ((*curr)->next != NULL){ 
+      Node * temp = ans->head;
+      Node * add = new Node((*curr)->next->data);
+      if (temp->data > (*curr)->next->data){ //checks if node should go in the front
+	add->next = ans->head;
+	ans->head = add;
       }
       else{
-	ans->addBack((*curr)->next->data);
+	while (temp->next != NULL){//locates where to insert node
+	  if ((*curr)->next->data < temp->next->data){
+	    add->next = temp->next;
+	    temp->next = add;
+	    break;
+	  }
+	  temp = temp->next;
+	}
+	if (temp->next == NULL){//node belongs at the end
+	  add->next = NULL;
+	  temp->next = add;
+	}
       }
       curr = &(*curr)->next;
     }
