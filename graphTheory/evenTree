@@ -1,0 +1,111 @@
+#include <cstdlib>
+#include <vector>
+#include <iostream>
+
+struct _edge{
+  int s1;
+  int s2;
+};
+typedef struct _edge edge;
+
+class Tree{
+private:
+  struct _dep{
+    int depth;
+    int nodeCut;
+  };
+  typedef struct _dep dep;
+  class Node{
+  public:
+    int nodeNumber;
+    std::vector<Node *> nodeMap;
+    Node(int n){
+      nodeNumber = n;
+    }    
+  }; 
+  Node * root;
+public:
+  Tree(): root(NULL){}
+  ~Tree(){
+    if (root == NULL){
+      return;
+    }
+    deleteHelper(root);
+  }
+  void deleteHelper(Node * current){
+    if (current->nodeMap.size() == 0){
+      delete current;
+      return;
+    }
+    for (unsigned i = 0; i < current->nodeMap.size(); i++){
+      deleteHelper(current->nodeMap[i]);
+    }
+    delete current;
+  }
+  void addEdge(const edge & newEdge){
+    if (root == NULL){
+      Node * toAdd = new Node(newEdge.s1);
+      root = toAdd;
+    }
+    addEdgeHelper(newEdge, root);
+    return;
+  }
+  void addEdgeHelper(const edge & newEdge, Node * current){
+    if (current->nodeNumber == newEdge.s1){
+      Node * toAdd = new Node(newEdge.s2);
+      current->nodeMap.push_back(toAdd);
+      return;
+    }
+    if (current->nodeNumber == newEdge.s2){
+      Node * toAdd = new Node(newEdge.s1);
+      current->nodeMap.push_back(toAdd);
+      return;
+    }
+    for (unsigned i = 0; i < current->nodeMap.size(); i++){
+      addEdgeHelper(newEdge, current->nodeMap[i]); //recursive search of tree for node to add
+    }
+    return;
+  }
+  int detEdgeDel(void){
+    dep ans = detEdgeDelHelper(root);
+    ans.nodeCut--; //the algorithm counts the fact that there is an even number as nodes as a cut needed so one must be subtracted
+    return ans.nodeCut;
+  }
+  dep detEdgeDelHelper(Node * current){
+    dep ans;
+    ans.depth = 1; //the current node
+    ans.nodeCut = 0;
+    if (current->nodeMap.size() == 0){
+      return ans;
+    }
+    for (unsigned i = 0; i < current->nodeMap.size(); i++){
+      dep temp = detEdgeDelHelper(current->nodeMap[i]);
+      ans.depth = ans.depth + temp.depth;
+      ans.nodeCut += temp.nodeCut;
+    }
+    if (ans.depth != 0 && ans.depth % 2 == 0){
+      ans.nodeCut++;
+      ans.depth = 0;
+    }
+    return ans;
+  }
+};
+    
+int main() {
+    int numNodes;
+    int numEdges;
+    std::cin >> numNodes >> numEdges;
+    Tree problemTree;
+    for (int i = 0; i < numEdges; i++){
+        int in1;
+        int in2;
+	std::cin >> in1 >> in2;        
+        edge toAdd;
+        toAdd.s1 = in1;
+        toAdd.s2 = in2;
+        problemTree.addEdge(toAdd);
+    }
+    int ans = problemTree.detEdgeDel();
+    std::cout << ans << std::endl;
+    return EXIT_SUCCESS;
+}
